@@ -9,28 +9,28 @@
         "alaouy/youtube": "^2.2",
         "barryvdh/laravel-cors": "^0.11",
         "barryvdh/laravel-dompdf": "^0.8.4",
-        "spatie/laravel-activitylog": "3.6.*",
-        "braintree/braintree_php": "3.*",
+        "spatie/laravel-activitylog": "3.9.*",
+        "braintree/braintree_php": "5.*",
         "hashids/hashids": "^3.0",
         "intervention/image": "^2.4.2",
         "kalnoy/nestedset": "^4.3",
-        "laravel/framework": "5.8.*",
-        "laravel/passport": "^7.0",
+        "laravel/framework": "^6.0",
+        "laravel/passport": "^8.0",
         "laravel/tinker": "^1.0",
         "league/fractal": "^0.17.0",
         "ruflin/elastica": "dev-master",
-        "spatie/laravel-permission": "2.37.*",
+        "spatie/laravel-permission": "3.*",
         "vinkla/hashids": "^5.1.0",
-        "vimeo/laravel": "5.3.*",
-        "doctrine/dbal": "2.9.2",
-        "paypal/rest-api-sdk-php": "*"
+        "vimeo/laravel": "5.4.*",
+        "doctrine/dbal": "2.10.*",
+        "paypal/rest-api-sdk-php": "1.14.*",
+        "laravel/helpers": "1.*"
     },
     "require-dev": {
         "fzaninotto/faker": "~1.4",
-        "mockery/mockery": "~1.0",
-        "phpunit/phpunit": "~7.0",
-        "filp/whoops": "~2.0",
-        "orchestra/testbench": "~3.6"
+        "mockery/mockery": "~1.2",
+        "phpunit/phpunit": "~8.0",
+        "orchestra/testbench": "~4.*"
     },
     "autoload": {
         "psr-4": {
