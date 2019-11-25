@@ -28,5 +28,7 @@ class TestingDatabaseSeeder extends Seeder
         $this->call(SettingTableSeeder::class);
         $this->call(ShippingTableSeeder::class);
         $this->call(DiscountTableSeeder::class);
+        $this->call(AssetTableSeeder::class);
+        $this->call(AssetSourceTableSeeder::class);
     }
 }

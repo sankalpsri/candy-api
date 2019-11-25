@@ -15,10 +15,10 @@ class AssetResource extends AbstractResource
             'caption' => $this->caption,
             'kind' => $this->kind,
             'external' => (bool) $this->external,
-            // 'thumbnail' => $this->getThumbnail($asset),
+            'thumbnail' => $this->getThumbnail($this),
             'position' => (int) $this->position,
             'primary' => (bool) $this->primary,
-            'url' => $this->url,
+            'url' => $this->getUrl($this),
         ];
 
         if (! $this->external) {
@@ -29,10 +29,35 @@ class AssetResource extends AbstractResource
                 'size' => $this->size,
                 'width' => $this->width,
                 'height' => $this->height,
+                'url' => $this->getUrl($this),
             ]);
+        } else {
+            $data['url'] = $this->location;
         }
 
         return $data;
+    }
+
+    protected function getThumbnail($asset)
+    {
+        $transform = $asset->transforms->filter(function ($transform) {
+            return $transform->transform->handle == 'thumbnail';
+        })->first();
+
+        if (! $transform) {
+            return;
+        }
+
+        $path = $transform->location.'/'.$transform->filename;
+
+        return Storage::disk($asset->source->disk)->url($path);
+    }
+
+    protected function getUrl($asset)
+    {
+        $path = $asset->location.'/'.$asset->filename;
+
+        return Storage::disk($asset->source->disk)->url($path);
     }
 
     public function includes()

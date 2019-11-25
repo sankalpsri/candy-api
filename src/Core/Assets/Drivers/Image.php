@@ -31,6 +31,7 @@ class Image extends BaseUploadDriver implements AssetDriverContract
                 $asset->extension = 'jpg';
             } else {
                 $image = InterventionImage::make($data['file']);
+                dd($image);
             }
             $asset->width = $image->width();
             $asset->height = $image->height();

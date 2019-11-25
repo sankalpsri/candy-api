@@ -84,6 +84,7 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
             \Spatie\Permission\PermissionServiceProvider::class,
             \Spatie\Activitylog\ActivitylogServiceProvider::class,
             \Vinkla\Hashids\HashidsServiceProvider::class,
+            \Intervention\Image\ImageServiceProviderLaravelRecent::class,
         ];
     }
 
@@ -93,6 +94,7 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
             'CurrencyConverter' => \GetCandy\Api\Core\Currencies\Facades\CurrencyConverter::class,
             'TaxCalculator' => \Facades\GetCandy\Api\Core\Taxes\TaxCalculator::class,
             'PriceCalculator' => \Facades\GetCandy\Api\Core\Pricing\PriceCalculator::class,
+            'Image' => Intervention\Image\Facades\Image::class,
             'GetCandy' => \GetCandy\Api\Core\Facades\GetCandyFacade::class,
         ];
     }
