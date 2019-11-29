@@ -12,7 +12,7 @@ use GetCandy\Api\Http\Requests\Assets\UploadRequest;
 use GetCandy\Api\Http\Resources\Assets\AssetResource;
 use GetCandy\Api\Http\Requests\Assets\UpdateAllRequest;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
-use GetCandy\Api\Http\Transformers\Fractal\Assets\AssetTransformer;
+//use GetCandy\Api\Http\Transformers\Fractal\Assets\AssetTransformer;
 
 class AssetController extends BaseController
 {
@@ -74,7 +74,6 @@ class AssetController extends BaseController
         }
 
         return new AssetResource($asset, $this->parseIncludedFields($request));
-        //return $this->respondWithItem($asset, new AssetTransformer);
     }
 
     public function destroy($id)
@@ -95,6 +94,6 @@ class AssetController extends BaseController
             $this->respondWithError();
         }
 
-        return $this->respondWithComplete();
+        return AssetResource::collection($result);
     }
 }

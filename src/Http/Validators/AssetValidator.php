@@ -11,6 +11,7 @@ class AssetValidator
         }
 
         $method = 'validate'.title_case($parameters[0]).'Url';
+
         if (method_exists($this, $method)) {
             return call_user_func([$this, $method], $value);
         }

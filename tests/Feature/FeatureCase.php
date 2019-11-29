@@ -63,6 +63,8 @@ abstract class FeatureCase extends TestCase
             'provider' => 'users',
         ]);
 
+        // $app['config']->set('env', 'local');
+        // $app['config']->set('debug', true);
         $app['config']->set('assets.max_filesize', '2000');
         $app['config']->set('assets.allowed_filetypes', 'jpg,jpeg,png,pdf,gif,bmp,svg,doc,docx,xls,csv');
         $app['config']->set('assets.upload_drivers', [

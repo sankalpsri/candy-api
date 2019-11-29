@@ -2,13 +2,15 @@
 
 namespace Tests\Feature\Http\Controllers\Assets;
 
+use Mockery;
 use Tests\Feature\FeatureCase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
-use GetCandy\Api\Core\Products\Models\Product;
 use GetCandy\Api\Core\Assets\Models\Asset;
-use Mockery;
+use GetCandy\Api\Core\Products\Models\Product;
 use GetCandy\Api\Core\Assets\Services\AssetService;
+use GetCandy\Api\Core\Assets\Jobs\CleanUpAssetFiles;
+use GetCandy\Api\Http\Resources\Assets\AssetResource;
 
 /**
  * @group feature
@@ -16,11 +18,9 @@ use GetCandy\Api\Core\Assets\Services\AssetService;
 class AssetControllerTest extends FeatureCase
 {
 
-    public function test_can_create_asset_from_url()
+    public function test_can_create_asset_from_file()
     {
         $user = $this->admin();
-
-        // Get an attribute group
         $product = Product::first();
         Storage::fake('assets');
 
@@ -28,144 +28,132 @@ class AssetControllerTest extends FeatureCase
             $mock->shouldReceive('upload')->once()->andReturn(Asset::first());
         }));
 
+        config()->set('filesystems.disks.public', [
+            'driver' => 'local',
+            'root' => '/',
+            'url' => '/',
+            'visibility' => 'public',
+        ]);
+
         $response = $this->actingAs($user)->json('POST', 'assets', [
             'file'      => UploadedFile::fake()->image('asset.jpg')->size(1999),
             'parent'    => 'products',
             'parent_id' => $product->encodedId()
         ]);
 
-        dd($response->content());
-
-        $structure = [
+        $response->assertJsonStructure([
             'data' => [
                 'id',
-                'name',
-                'handle',
+                'title',
+                'kind',
+                'external',
                 'position',
-            ],
-            'meta'
-        ];
-
-        $response->assertJsonStructure($structure);
+                'primary',
+                'url',
+                'sub_kind',
+                'original_filename',
+                'size',
+                'width',
+                'height'
+            ]
+        ]);
 
         $response->assertJson([
             'data' => [
-                'name' => [
-                    'en' => 'Test Group',
-                ],
-                'handle' => 'test-group',
+                'title'    => 'asset title',
+                'caption'  => 'asset caption',
+                'kind'     => 'image',
+                'sub_kind' => 'jpeg',
+                'size'     => '1999',
+                'width'    => '200',
+                'height'   => '200'
             ]
         ]);
     }
 
-    protected function getUploadResponse()
-    {
-        
+    // public function test_can_create_asset_from_url()
+    // {
+    //     $product = Product::first();
 
-        
-    }
+    //     $this->app->instance(AssetService::class, Mockery::mock(AssetService::class, function ($mock) {
+    //         $mock->shouldReceive('upload')->once()->andReturn(Asset::first());
+    //     }));
 
-    public function test_can_update_attribute_group()
-    {
-        $user = $this->admin();
+    //     $response = $this->actingAs($this->admin())->json('POST', 'assets', [
+    //         'url'       => 'https://www.youtube.com/embed/C0DPdy98e4c',
+    //         'mime_type' => 'youtube',
+    //         'parent'    => 'products',
+    //         'parent_id' => $product->encodedId()
+    //     ]);
 
-        // Get an attribute group
-        $group = AttributeGroup::first();
+    //     dd($response->getContent());
 
-        $response = $this->actingAs($user)->json('PUT', "attribute-groups/{$group->encodedId()}", [
-            'name' => [
-                'en' => 'Updated Name',
-            ],
-            'handle' => 'updated-handle',
-            'position' => 9999,
-        ]);
+    //     $response->assertJsonStructure([
+    //         'data' => [
+    //             'id',
+    //             'title',
+    //             'kind',
+    //             'external',
+    //             'position',
+    //             'primary',
+    //             'url',
+    //             'sub_kind',
+    //             'original_filename',
+    //             'size',
+    //             'width',
+    //             'height'
+    //         ]
+    //     ]);
 
-        $structure = [
-            'data' => [
-                'id',
-                'name',
-                'handle',
-                'position',
-            ],
-            'meta'
-        ];
+    //     $response->assertJson([
+    //         'data' => []
+    //     ]);
+    // }
 
-        $response->assertJsonStructure($structure);
-
-        $response->assertJson([
-            'data' => [
-                'name' => [
-                    'en' => 'Updated Name',
-                ],
-                'handle' => 'updated-handle',
-                'position' => 9999,
-            ],
-        ]);
-    }
-
-    /**
-     * @group test
-     */
-    public function test_can_reorder_attribute_groups()
+    public function test_can_update_asset()
     {
         $user = $this->admin();
+        $asset = Asset::first();
+        config()->set('filesystems.disks.public', [
+            'driver' => 'local',
+            'root' => '/',
+            'url' => '/',
+            'visibility' => 'public',
+        ]);
 
-        $response = $this->actingAs($user)->json('GET', 'attribute-groups');
-
-        $marketing = AttributeGroup::whereHandle('marketing')->first();
-        $seo = AttributeGroup::whereHandle('seo')->first();
-
-
-        $response->assertJson([
-            'data' => [
+        $response = $this->actingAs($user)->json('PUT', 'assets', [
+            'assets' => [
                 [
-                    'handle' => 'marketing',
-                    'position' => 1,
-                ],
-                [
-                    'handle' => 'seo',
-                    'position' => 2,
+                    'id'      => $asset->encodedId(),
+                    'caption' => 'new asset caption',
+                    'title'   => 'new asset title'
                 ]
-            ],
+            ]
         ]);
 
-        $this->actingAs($user)->json('PUT', 'attribute-groups/order', [
-            'groups' => [
-                $marketing->encodedId() => 2,
-                $seo->encodedId() => 1,
-            ]
-        ])->assertStatus(204);
-
-        $response = $this->actingAs($user)->json('GET', 'attribute-groups');
-
+        $response->assertStatus(200);
         $response->assertJson([
             'data' => [
                 [
-                    'handle' => 'seo',
-                    'position' => 1,
-                ],
-                [
-                    'handle' => 'marketing',
-                    'position' => 2,
-                ],
-            ],
+                    'caption' => 'new asset caption',
+                    'title'   => 'new asset title'
+                ]
+            ]
         ]);
-
     }
 
-    public function test_can_delete_attribute_group()
+    public function test_can_delete_asset()
     {
         $user = $this->admin();
+        $asset = Asset::first();
 
-        // Get an attribute group
-        $group = AttributeGroup::first();
+        $this->expectsJobs(CleanUpAssetFiles::class);
 
-        $response = $this->actingAs($user)->json('DELETE', "attribute-groups/{$group->encodedId()}");
-
+        $response = $this->actingAs($user)->json('DELETE', "assets/{$asset->encodedId()}");
         $response->assertStatus(204);
 
-        $response = $this->actingAs($user)->json('DELETE', "attribute-groups/{$group->encodedId()}");
-
+        $response = $this->actingAs($user)->json('DELETE', "assets/{$asset->encodedId()}");
         $response->assertStatus(404);
     }
+
 }

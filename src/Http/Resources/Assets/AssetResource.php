@@ -4,6 +4,7 @@ namespace GetCandy\Api\Http\Resources\Assets;
 
 use GetCandy\Api\Http\Resources\AbstractResource;
 use GetCandy\Api\Http\Resources\Tags\TagCollection;
+use Storage;
 
 class AssetResource extends AbstractResource
 {
@@ -38,7 +39,7 @@ class AssetResource extends AbstractResource
         return $data;
     }
 
-    protected function getThumbnail($asset)
+    public function getThumbnail($asset)
     {
         $transform = $asset->transforms->filter(function ($transform) {
             return $transform->transform->handle == 'thumbnail';
@@ -53,18 +54,10 @@ class AssetResource extends AbstractResource
         return Storage::disk($asset->source->disk)->url($path);
     }
 
-    protected function getUrl($asset)
+    public function getUrl($asset)
     {
         $path = $asset->location.'/'.$asset->filename;
 
         return Storage::disk($asset->source->disk)->url($path);
-    }
-
-    public function includes()
-    {
-        return [
-            'transforms' => new AssetTransformCollection($this->whenLoaded('transforms')),
-            'tags' => new TagCollection($this->whenLoaded('tags')),
-        ];
     }
 }
